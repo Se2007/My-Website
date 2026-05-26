@@ -1,0 +1,295 @@
+---
+import Base from '../layouts/Base.astro';
+
+import { getCollection } from 'astro:content';
+
+const achievements = (await getCollection('achievements', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
+
+const projects = [
+  { title: 'Project 1', description: 'Short description.', image: '/projects/project1.jpg', link: '#' },
+  { title: 'Project 2', description: 'Short description.', image: '/projects/project2.jpg', link: '#' },
+  { title: 'Project 3', description: 'Short description.', image: null, link: '#' },
+];
+
+const posts = [
+  { title: 'Post Title 1', description: 'Short description.', date: 'Jan 2024', slug: '#' },
+  { title: 'Post Title 2', description: 'Short description.', date: 'Dec 2023', slug: '#' },
+  { title: 'Post Title 3', description: 'Short description.', date: 'Nov 2023', slug: '#' },
+];
+---
+
+<Base title="Home">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-text">
+      <h1><span class="first-name">Sepehr</span> Eslami Moghadam</h1>
+      <p>
+        Persian with proud, and a self-taught maker who builds and breaks
+        boundaries in computer science, with the spirit of an experimental
+        engineer who is passionate about the practical side of bringing AI to
+        the real world. From theory to deployment. Currently obsessed with
+        deep neural networks, medical computer vision, and machine learning
+        reinforcement systems.
+      </p>
+    </div>
+    <div class="hero-image">
+      <img src="/profile.jpg" alt="Sepehr Eslami Moghadam" />
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <section>
+    <div class="section-header">
+      <h2>Achievements</h2>
+      <a href="/achievements">See all →</a>
+    </div>
+    <div class="ach-list">
+      {achievements.map(item => {
+          const year = new Date(item.data.date).getFullYear();
+          return (
+            <a href={`/achievements/${item.slug}`} class="ach-item">
+              <span class="ach-year">{year}</span>
+              <div>
+                <p class="ach-title">{item.data.title}</p>
+                {item.data.description && (
+                  <p class="ach-desc">{item.data.description}</p>
+                )}
+              </div>
+            </a>
+          );
+        })}
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section>
+    <div class="section-header">
+      <h2>Projects</h2>
+      <a href="/projects">See all →</a>
+    </div>
+    <div class="grid-3">
+      {projects.slice(0, 3).map(project => (
+        <a href={project.link} target="_blank" rel="noopener" class="card">
+          {project.image
+            ? <img src={project.image} alt={project.title} class="card-img" />
+            : <div class="card-img-empty" />
+          }
+          <div class="card-body">
+            <p class="card-title">{project.title}</p>
+            <p class="card-desc">{project.description}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Posts -->
+  <section>
+    <div class="section-header">
+      <h2>Latest Posts</h2>
+      <a href="/blog">See all →</a>
+    </div>
+    <div class="grid-3">
+      {posts.slice(0, 3).map(post => (
+        <a href={`/blog/${post.slug}`} class="card">
+          <div class="card-body">
+            <p class="post-date">{post.date}</p>
+            <p class="card-title">{post.title}</p>
+            <p class="card-desc">{post.description}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+</Base>
+<style>
+  /* Hero */
+  .hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 4rem;
+    padding: 5rem 0 4rem;
+    margin-bottom: 5rem;
+  }
+
+  .hero-text { flex: 1; }
+
+  .hero-text h1 {
+    font-size: 3rem;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .first-name {
+    font-weight: 700;
+  }
+
+  .hero-text p {
+    font-size: 1.35rem;
+    line-height: 2;
+    color: var(--secondary);
+    max-width: 750px;
+  }
+
+  .hero-image img {
+    width: 290px;
+    height: 290px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    filter: grayscale(20%);
+  }
+
+  /* Sections */
+  section {
+    margin-bottom: 5rem;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+
+  .section-header h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--secondary);
+  }
+
+  .section-header a {
+    font-size: 0.8rem;
+    color: var(--secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .section-header a:hover { color: var(--primary); }
+
+  /* Achievements */
+  .ach-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ach-item, .ach-item * {
+  text-decoration: none !important;
+}
+
+  .ach-item {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ach-item:first-child {
+    border-top: 1px solid var(--border);
+  }
+
+  .ach-year {
+    font-size: 0.85rem;
+    color: var(--secondary);
+    min-width: 40px;
+    padding-top: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .ach-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--primary);
+  }
+
+  .ach-desc {
+    font-size: 0.95rem;
+    color: var(--secondary);
+    line-height: 1.6;
+  }
+
+  /* Grid */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Cards */
+  .card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    background: var(--entry);
+    transition: background 0.2s;
+  }
+
+  .card:hover { background: var(--tag-bg); }
+
+  .card-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+    filter: grayscale(15%);
+    transition: filter 0.3s;
+  }
+
+  .card:hover .card-img { filter: grayscale(0%); }
+
+  .card-img-empty {
+    width: 100%;
+    height: 160px;
+    background: var(--border);
+  }
+
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+  }
+
+  .card-desc {
+    font-size: 0.95rem;
+    color: var(--secondary);
+    line-height: 1.6;
+  }
+
+  .post-date {
+    font-size: 0.75rem;
+    color: var(--secondary);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.04em;
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem 0;
+    }
+    .hero-text h1 { font-size: 2rem; }
+    .hero-image img { width: 180px; height: 180px; }
+    .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>

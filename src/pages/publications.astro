@@ -1,0 +1,167 @@
+---
+import Base from '../layouts/Base.astro';
+
+const publications = [
+  {
+    title: 'Publication Title',
+    authors: 'Sepehr Eslami Moghadam, Co-Author Name',
+    journal: 'Journal Name',
+    year: '2024',
+    image: '/publications/pub1.jpg',
+    links: {
+      pdf: '#',
+      html: '#',
+    },
+  },
+  {
+    title: 'Publication Title',
+    authors: 'Sepehr Eslami Moghadam',
+    journal: null,
+    year: '2023',
+    image: null,
+    links: {
+      pdf: '#',
+    },
+  },
+];
+---
+
+<Base title="Publications">
+  <h1>Publications</h1>
+  <p class="subtitle">Publications in reversed chronological order.</p>
+
+  <div class="list">
+    {publications.map(pub => (
+      <div class="item">
+        <div class="item-image">
+          {pub.image
+            ? <img src={pub.image} alt={pub.title} />
+            : <div class="no-image" />
+          }
+        </div>
+
+        <div class="item-content">
+          <h2>{pub.title}</h2>
+          <p class="authors">{pub.authors}</p>
+          {pub.journal && <p class="journal">{pub.journal}, {pub.year}</p>}
+          {!pub.journal && <p class="year-text">{pub.year}</p>}
+          <div class="links">
+            {pub.links.pdf && <a href={pub.links.pdf} target="_blank">PDF</a>}
+            {pub.links.html && <a href={pub.links.html} target="_blank">HTML</a>}
+          </div>
+        </div>
+
+        <div class="item-year">{pub.year}</div>
+      </div>
+    ))}
+  </div>
+</Base>
+
+<style>
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: var(--secondary);
+    margin-bottom: 3rem;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .item {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .item-image {
+    flex-shrink: 0;
+  }
+
+  .item-image img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .no-image {
+    width: 100px;
+    height: 100px;
+    background: var(--border);
+    border-radius: 4px;
+  }
+
+  .item-content {
+    flex: 1;
+  }
+
+  .item-content h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+  }
+
+  .authors {
+    font-size: 0.9rem;
+    color: var(--secondary);
+    margin-bottom: 0.25rem;
+  }
+
+  .journal {
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  .year-text {
+    font-size: 0.85rem;
+    color: var(--secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  .links {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .links a {
+    font-size: 0.8rem;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--secondary);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .links a:hover {
+    color: var(--primary);
+    border-color: var(--secondary);
+  }
+
+  .item-year {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--border);
+    flex-shrink: 0;
+    min-width: 60px;
+    text-align: right;
+  }
+
+  @media (max-width: 640px) {
+    .item-year { display: none; }
+    .item-image img,
+    .no-image { width: 70px; height: 70px; }
+  }
+</style>

@@ -1,0 +1,129 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const achievements = await getCollection('achievements', ({ data }) => !data.draft);
+  return achievements.map(item => ({
+    params: { slug: item.slug },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await item.render();
+// Using 'banner' as an optional field from frontmatter
+const { title, description, date, banner } = item.data;
+
+const formatted = new Date(date).toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+---
+
+<Base title={title} description={description}>
+  <article class="achievement-container">
+    
+    {/* Only renders the top banner if 'banner' is provided in the markdown frontmatter */}
+    {banner && (
+      <div class="main-banner">
+        <img src={banner} alt={title} />
+      </div>
+    )}
+
+    <header>
+      <h1>{title}</h1>
+      <time>{formatted}</time>
+    </header>
+
+    <div class="content">
+      <Content />
+    </div>
+
+    <a href="/achievements" class="back">← All achievements</a>
+  </article>
+</Base>
+
+<style>
+  .achievement-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+
+  /* Styling for the top banner layout */
+  .main-banner img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 2.5rem;
+  }
+
+  header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.25;
+  }
+
+  header time {
+    font-size: 0.85rem;
+    color: var(--secondary);
+  }
+
+  .content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  .content h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 2.5rem 0 1rem;
+  }
+
+  .content p { 
+    margin-bottom: 1.5rem; 
+  }
+
+  /* Beautifully handles any image you put inside the markdown body */
+  .content img {
+    width: 100%;
+    max-height: 480px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin: 2rem 0 0.5rem 0;
+    border: 1px solid var(--border);
+  }
+
+
+.content img {
+    display: block;          /* تبدیل به عنصر بلاک برای فعال شدن مارجین‌های چپ و راست */
+    width: 100%;             /* پر کردن کادر تا سقف مجاز */
+    max-width: 600px;        /* حد مجاز عرض عکس؛ این عدد را کمتر کردیم تا عکس کاملاً مهار شود */
+    height: auto;            /* حفظ تناسب ابعاد واقعی عکس */
+    max-height: 380px;       /* محدود کردن ارتفاع برای جلوگیری از عمودی و بلند شدن عکس */
+    object-fit: cover;       /* جلوگیری از کشیده شدن و دفرمه شدن تصویر */
+    border-radius: 8px;
+    margin: 2rem auto;       /* مقدار auto در چپ و راست، عکس را دقیقاً وسط متن می‌آورد */
+    border: 1px solid var(--border);
+  }
+
+  .back {
+    display: inline-block;
+    margin-top: 4rem;
+    font-size: 0.95rem;
+    color: var(--secondary);
+    text-decoration: none;
+  }
+
+  .back:hover { 
+    color: var(--primary); 
+  }
+</style>

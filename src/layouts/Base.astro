@@ -1,0 +1,96 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Sepehr',
+  description = 'Personal blog about AI, machine learning, and building things.',
+} = Astro.props;
+
+const fullTitle = title === 'Sepehr' ? title : `SEM`;
+const navLinks = [
+  { href: '/achievements', label: 'Achievements' },
+  { href: '/projects', label: 'Projects' },
+  { href: '/publications', label: 'Publications' },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="author" content="Sepehr Eslami Moghadam" />
+    <meta name="keywords" content="Blog, Portfolio, Sepehr, AI, Machine Learning, Computer Vision" />
+
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Sepehr" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <title>{fullTitle}</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="header-inner">
+        <div class="logo">
+          <a href="/">Home</a>
+        </div>
+        <nav style="margin-left: auto;">
+          {navLinks.map(link => (
+            <a href={link.href}>{link.label}</a>
+          ))}
+        </nav>
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          title="Toggle dark mode"
+          aria-label="Toggle dark mode"
+        >
+          <span id="theme-icon">☀️</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <div>
+        All content licensed under
+        <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC-BY-4.0</a>
+        · Powered by <a href="https://astro.build" target="_blank" rel="noopener">Astro</a>
+      </div>
+    </footer>
+
+    <script is:inline>
+      // Theme persistence
+      const stored = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const isDark = stored ? stored === 'dark' : prefersDark;
+
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      document.getElementById('theme-icon').textContent = isDark ? '🌙' : '☀️';
+
+      document.getElementById('theme-toggle').addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        document.getElementById('theme-icon').textContent = next === 'dark' ? '🌙' : '☀️';
+      });
+    </script>
+  </body>
+</html>
