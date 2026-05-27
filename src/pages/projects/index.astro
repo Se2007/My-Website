@@ -1,31 +1,11 @@
 ---
-import Base from '../layouts/Base.astro';
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
 
-const projects = [
-  {
-    title: 'Project 1',
-    description: 'Short description of the project.',
-    image: '/projects/project1.jpg',
-    link: 'https://github.com/yourusername/project1',
-    category: 'work',
-  },
-  {
-    title: 'Project 2',
-    description: 'Short description of the project.',
-    image: '/projects/project2.jpg',
-    link: 'https://github.com/yourusername/project2',
-    category: 'work',
-  },
-  {
-    title: 'Project 3',
-    description: 'Short description of the project.',
-    image: null,
-    link: 'https://github.com/yourusername/project3',
-    category: 'fun',
-  },
-];
+const projects = await getCollection('projects', ({ data }) => !data.draft);
+projects.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 
-const categories = [...new Set(projects.map(p => p.category))];
+const categories = [...new Set(projects.map(p => p.data.category))];
 ---
 
 <Base title="Projects">
@@ -36,16 +16,23 @@ const categories = [...new Set(projects.map(p => p.category))];
     <div class="category-section">
       <div class="category-label">{category}</div>
       <div class="grid">
-        {projects.filter(p => p.category === category).map(project => (
-          <a href={project.link} target="_blank" rel="noopener" class="card">
-            {project.image && (
+        {projects.filter(p => p.data.category === category).map(project => (
+          <a href={`/projects/${project.slug}`} class="card">
+            {project.data.banner && (
               <div class="card-image">
-                <img src={project.image} alt={project.title} />
+                <img src={project.data.banner} alt={project.data.title} />
               </div>
             )}
             <div class="card-body">
-              <h2>{project.title}</h2>
-              <p>{project.description}</p>
+              <h2>{project.data.title}</h2>
+              <p>{project.data.description}</p>
+              {project.data.tags && (
+                <div class="tags">
+                  {project.data.tags.map((tag: string) => (
+                    <span class="tag">{tag}</span>
+                  ))}
+                </div>
+              )}
             </div>
           </a>
         ))}
@@ -119,11 +106,24 @@ const categories = [...new Set(projects.map(p => p.category))];
     font-size: 0.9rem;
     color: var(--secondary);
     line-height: 1.6;
+    margin-bottom: 0.75rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    background: var(--tag-bg);
+    color: var(--tag-color);
+    padding: 2px 8px;
+    border-radius: 4px;
   }
 
   @media (max-width: 640px) {
-    .grid {
-      grid-template-columns: 1fr;
-    }
+    .grid { grid-template-columns: 1fr; }
   }
 </style>

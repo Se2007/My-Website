@@ -3,8 +3,8 @@ import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const achievements = await getCollection('achievements', ({ data }) => !data.draft);
-  return achievements.map(item => ({
+  const projects = await getCollection('projects', ({ data }) => !data.draft);
+  return projects.map(item => ({
     params: { slug: item.slug },
     props: { item },
   }));
@@ -12,7 +12,7 @@ export async function getStaticPaths() {
 
 const { item } = Astro.props;
 const { Content } = await item.render();
-const { title, description, date, banner } = item.data;
+const { title, description, date, banner, github, demo, tags } = item.data;
 
 const formatted = new Date(date).toLocaleDateString('en-US', {
   year: 'numeric', month: 'long', day: 'numeric',
@@ -20,8 +20,8 @@ const formatted = new Date(date).toLocaleDateString('en-US', {
 ---
 
 <Base title={title} description={description}>
-  <article class="achievement-container">
-    
+  <article class="project-container">
+
     {banner && (
       <div class="main-banner">
         <img src={banner} alt={title} />
@@ -31,18 +31,35 @@ const formatted = new Date(date).toLocaleDateString('en-US', {
     <header>
       <h1>{title}</h1>
       <time>{formatted}</time>
+
+      <div class="links">
+        {github && (
+          <a href={github} target="_blank" rel="noopener" class="btn">GitHub</a>
+        )}
+        {demo && (
+          <a href={demo} target="_blank" rel="noopener" class="btn btn-outline">Live Demo</a>
+        )}
+      </div>
+
+      {tags && (
+        <div class="tags">
+          {tags.map((tag: string) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      )}
     </header>
 
     <div class="content">
       <Content />
     </div>
 
-    <a href="/achievements" class="back">← All achievements</a>
+    <a href="/projects" class="back">← All projects</a>
   </article>
 </Base>
 
 <style>
-  .achievement-container {
+  .project-container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 2rem 0;
@@ -72,6 +89,46 @@ const formatted = new Date(date).toLocaleDateString('en-US', {
   header time {
     font-size: 0.85rem;
     color: var(--secondary);
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .links {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn {
+    font-size: 0.9rem;
+    padding: 6px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    background: var(--primary);
+    color: var(--theme);
+    transition: opacity 0.2s;
+  }
+
+  .btn:hover { opacity: 0.8; }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--border);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 0.75rem;
+    background: var(--tag-bg);
+    color: var(--tag-color);
+    padding: 2px 8px;
+    border-radius: 4px;
   }
 
   .content {
@@ -85,20 +142,8 @@ const formatted = new Date(date).toLocaleDateString('en-US', {
     margin: 2.5rem 0 1rem;
   }
 
-  .content p { 
-    margin-bottom: 1.5rem; 
-  }
-
-  .content img {
-    display: block !important;
-    width: 100% !important;
-    max-width: 480px !important;
-    height: 300px !important;
-    object-fit: cover !important;
-    object-position: top !important;
-    border-radius: 8px;
-    margin: 2rem auto !important;
-    border: 1px solid var(--border);
+  .content p {
+    margin-bottom: 1.5rem;
   }
 
   .back {
@@ -109,7 +154,7 @@ const formatted = new Date(date).toLocaleDateString('en-US', {
     text-decoration: none;
   }
 
-  .back:hover { 
-    color: var(--primary); 
+  .back:hover {
+    color: var(--primary);
   }
 </style>

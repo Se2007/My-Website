@@ -1,0 +1,97 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft && !data.link);
+  return posts.map(item => ({
+    params: { slug: item.slug },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+const { Content } = await item.render();
+const { title, description, date, banner, tags } = item.data;
+
+const formatted = new Date(date).toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+---
+
+<Base title={title} description={description}>
+  <article class="blog-container">
+
+    {banner && (
+      <div class="main-banner">
+        <img src={banner} alt={title} />
+      </div>
+    )}
+
+    <header>
+      <h1>{title}</h1>
+      <div class="meta">
+        <time>{formatted}</time>
+        {tags && (
+          <div class="tags">
+            {tags.map((tag: string) => <span class="tag">{tag}</span>)}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <div class="content">
+      <Content />
+    </div>
+
+    <a href="/blog" class="back">← All posts</a>
+  </article>
+</Base>
+
+<style>
+  .blog-container { max-width: 1000px; margin: 0 auto; padding: 2rem 0; }
+
+  .main-banner img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 2.5rem;
+  }
+
+  header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.75rem; line-height: 1.25; }
+
+  .meta { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+
+  time { font-size: 0.85rem; color: var(--secondary); }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .tag {
+    font-size: 0.75rem;
+    background: var(--tag-bg);
+    color: var(--tag-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .content { font-size: 1.1rem; line-height: 1.8; }
+  .content h2 { font-size: 1.5rem; font-weight: 600; margin: 2.5rem 0 1rem; }
+  .content p { margin-bottom: 1.5rem; }
+
+  .back {
+    display: inline-block;
+    margin-top: 4rem;
+    font-size: 0.95rem;
+    color: var(--secondary);
+    text-decoration: none;
+  }
+
+  .back:hover { color: var(--primary); }
+</style>

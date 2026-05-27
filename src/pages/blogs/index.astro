@@ -1,0 +1,163 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blogs', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const years = [...new Set(posts.map(p => new Date(p.data.date).getFullYear()))];
+---
+
+<Base title="Blog">
+  <h1>Blog</h1>
+  <p class="subtitle">Thoughts, tutorials, and ideas.</p>
+
+  {years.map(year => (
+    <div class="year-group">
+      <div class="year-divider">
+        <span>{year}</span>
+      </div>
+
+      <div class="list">
+        {posts.filter(p => new Date(p.data.date).getFullYear() === year).map(post => (
+          <a
+            href={post.data.link ?? `/blog/${post.slug}`}
+            target={post.data.link ? '_blank' : '_self'}
+            rel={post.data.link ? 'noopener' : ''}
+            class="item"
+          >
+            {post.data.banner && (
+              <div class="item-image">
+                <img src={post.data.banner} alt={post.data.title} />
+              </div>
+            )}
+
+            <div class="item-content">
+              <h2>
+                {post.data.title}
+                {post.data.link && <span class="external">↗</span>}
+              </h2>
+              <p class="desc">{post.data.description}</p>
+              {post.data.tags && (
+                <div class="tags">
+                  {post.data.tags.map((tag: string) => (
+                    <span class="tag">{tag}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <time class="item-date">
+              {new Date(post.data.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </time>
+          </a>
+        ))}
+      </div>
+    </div>
+  ))}
+</Base>
+
+<style>
+  h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .subtitle { color: var(--secondary); margin-bottom: 3rem; }
+
+  .year-group { margin-bottom: 2.5rem; }
+
+  .year-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .year-divider span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--secondary);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .year-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .list { display: flex; flex-direction: column; }
+
+  .item {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    border-radius: 6px;
+    transition: background 0.2s, padding-left 0.25s ease;
+  }
+
+  .item:first-child { border-top: 1px solid var(--border); }
+  .item:hover { background: var(--tag-bg); padding-left: 1.25rem; }
+
+  .item-image { flex-shrink: 0; }
+
+  .item-image img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    transition: transform 0.3s ease;
+  }
+
+  .item:hover .item-image img { transform: scale(1.04); }
+
+  .item-content { flex: 1; }
+
+  .item-content h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    line-height: 1.4;
+    color: var(--primary);
+  }
+
+  .external {
+    font-size: 0.85rem;
+    color: var(--secondary);
+    margin-left: 4px;
+  }
+
+  .desc {
+    font-size: 0.9rem;
+    color: var(--secondary);
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 5px; }
+
+  .tag {
+    font-size: 0.72rem;
+    background: var(--tag-bg);
+    color: var(--tag-color);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .item-date {
+    font-size: 0.8rem;
+    color: var(--secondary);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 640px) {
+    .item-image { display: none; }
+    .item-date { display: none; }
+  }
+</style>

@@ -7,17 +7,13 @@ const achievements = (await getCollection('achievements', ({ data }) => !data.dr
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
   .slice(0, 3);
 
-const projects = [
-  { title: 'Project 1', description: 'Short description.', image: '/projects/project1.jpg', link: '#' },
-  { title: 'Project 2', description: 'Short description.', image: '/projects/project2.jpg', link: '#' },
-  { title: 'Project 3', description: 'Short description.', image: null, link: '#' },
-];
+const projects = (await getCollection('projects', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
 
-const posts = [
-  { title: 'Post Title 1', description: 'Short description.', date: 'Jan 2024', slug: '#' },
-  { title: 'Post Title 2', description: 'Short description.', date: 'Dec 2023', slug: '#' },
-  { title: 'Post Title 3', description: 'Short description.', date: 'Nov 2023', slug: '#' },
-];
+const publications = (await getCollection('publications', ({ data }) => !data.draft))
+  .sort((a, b) => Number(b.data.year) - Number(a.data.year))
+  .slice(0, 3);
 ---
 
 <Base title="Home">
@@ -71,15 +67,15 @@ const posts = [
       <a href="/projects">See all →</a>
     </div>
     <div class="grid-3">
-      {projects.slice(0, 3).map(project => (
-        <a href={project.link} target="_blank" rel="noopener" class="card">
-          {project.image
-            ? <img src={project.image} alt={project.title} class="card-img" />
+      {projects.map(project => (
+        <a href={`/projects/${project.slug}`} class="card">
+          {project.data.banner
+            ? <img src={project.data.banner} alt={project.data.title} class="card-img" />
             : <div class="card-img-empty" />
           }
           <div class="card-body">
-            <p class="card-title">{project.title}</p>
-            <p class="card-desc">{project.description}</p>
+            <p class="card-title">{project.data.title}</p>
+            <p class="card-desc">{project.data.description}</p>
           </div>
         </a>
       ))}
@@ -89,17 +85,18 @@ const posts = [
   <!-- Posts -->
   <section>
     <div class="section-header">
-      <h2>Latest Posts</h2>
-      <a href="/blog">See all →</a>
+      <h2>Publications</h2>
+      <a href="/publications">See all →</a>
     </div>
-    <div class="grid-3">
-      {posts.slice(0, 3).map(post => (
-        <a href={`/blog/${post.slug}`} class="card">
-          <div class="card-body">
-            <p class="post-date">{post.date}</p>
-            <p class="card-title">{post.title}</p>
-            <p class="card-desc">{post.description}</p>
+    <div class="pub-list">
+      {publications.map(pub => (
+        <a href={`/publications/${pub.slug}`} class="pub-item">
+          <span class="pub-year">{pub.data.year}</span>
+          <div>
+            <p class="pub-title">{pub.data.title}</p>
+            <p class="pub-venue">{pub.data.venue}</p>
           </div>
+          <span class={`badge badge-${pub.data.type}`}>{pub.data.type}</span>
         </a>
       ))}
     </div>
@@ -192,6 +189,13 @@ const posts = [
     align-items: flex-start;
     padding: 1.25rem 0;
     border-bottom: 1px solid var(--border);
+    transition: padding-left 0.25s ease, opacity 0.25s ease;
+    cursor: pointer;
+  }
+
+  .ach-item:hover {
+    padding-left: 0.75rem;
+    opacity: 0.75;
   }
 
   .ach-item:first-child {
@@ -211,6 +215,11 @@ const posts = [
     font-weight: 600;
     margin-bottom: 0.25rem;
     color: var(--primary);
+    transition: color 0.2s;
+  }
+
+  .ach-item:hover .ach-title {
+    color: var(--link-hover);
   }
 
   .ach-desc {
@@ -235,10 +244,17 @@ const posts = [
     color: inherit;
     display: block;
     background: var(--entry);
-    transition: background 0.2s;
+    transition: background 0.2s, transform 0.25s ease, box-shadow 0.25s ease;
+    position: relative;
+    overflow: hidden;
   }
 
-  .card:hover { background: var(--tag-bg); }
+  .card:hover {
+    background: var(--tag-bg);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    z-index: 1;
+  }
 
   .card-img {
     width: 100%;
@@ -246,10 +262,13 @@ const posts = [
     object-fit: cover;
     display: block;
     filter: grayscale(15%);
-    transition: filter 0.3s;
+    transition: filter 0.3s, transform 0.3s ease;
   }
 
-  .card:hover .card-img { filter: grayscale(0%); }
+  .card:hover .card-img {
+    filter: grayscale(0%);
+    transform: scale(1.04);
+  }
 
   .card-img-empty {
     width: 100%;
@@ -274,12 +293,62 @@ const posts = [
     line-height: 1.6;
   }
 
-  .post-date {
-    font-size: 0.75rem;
-    color: var(--secondary);
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.04em;
+  /* Publications */
+  .pub-list {
+    display: flex;
+    flex-direction: column;
   }
+
+  .pub-item {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    padding: 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    border-radius: 6px;
+    transition: background 0.2s, padding-left 0.25s;
+  }
+
+  .pub-item:first-child { border-top: 1px solid var(--border); }
+  .pub-item:hover { background: var(--tag-bg); padding-left: 1.25rem; }
+
+  .pub-year {
+    font-size: 0.85rem;
+    color: var(--secondary);
+    min-width: 40px;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+
+  .pub-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    color: var(--primary);
+  }
+
+  .pub-venue {
+    font-size: 0.85rem;
+    color: var(--secondary);
+    font-style: italic;
+  }
+
+  .badge {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .badge-journal    { background: rgba(59,130,246,0.12); color: #60a5fa; }
+  .badge-conference { background: rgba(16,185,129,0.12); color: #34d399; }
+  .badge-preprint   { background: rgba(245,158,11,0.12);  color: #fbbf24; }
 
   @media (max-width: 640px) {
     .hero {

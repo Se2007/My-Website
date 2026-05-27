@@ -1,0 +1,172 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const publications = (await getCollection('publications', ({ data }) => !data.draft))
+  .sort((a, b) => Number(b.data.year) - Number(a.data.year));
+
+const years = [...new Set(publications.map(p => p.data.year))];
+
+const myName = 'Sepehr Eslami Moghadam';
+
+const typeLabel: Record<string, string> = {
+  journal: 'Journal',
+  conference: 'Conference',
+  preprint: 'Preprint',
+};
+---
+
+<Base title="Publications">
+  <h1>Publications</h1>
+  <p class="subtitle">Publications in reversed chronological order.</p>
+
+  {years.map(year => (
+    <div class="year-group">
+      <div class="year-divider">
+        <span>{year}</span>
+      </div>
+
+      <div class="list">
+        {publications.filter(p => p.data.year === year).map(pub => (
+          <a href={`/publications/${pub.slug}`} class="item">
+            <div class="item-image">
+              {pub.data.banner
+                ? <img src={pub.data.banner} alt={pub.data.title} />
+                : <div class="no-image"><span>{pub.data.year}</span></div>
+              }
+            </div>
+
+            <div class="item-content">
+              <div class="item-top">
+                <span class={`badge badge-${pub.data.type}`}>{typeLabel[pub.data.type]}</span>
+              </div>
+              <h2>{pub.data.title}</h2>
+              <p class="authors" set:html={pub.data.authors.replace(myName, `<strong>${myName}</strong>`)} />
+              {pub.data.venue && <p class="venue">{pub.data.venue}</p>}
+              <div class="links">
+                {pub.data.pdf    && <span class="link-btn">PDF</span>}
+                {pub.data.arxiv  && <span class="link-btn">arXiv</span>}
+                {pub.data.doi    && <span class="link-btn">DOI</span>}
+                {pub.data.code   && <span class="link-btn">Code</span>}
+                {pub.data.demo   && <span class="link-btn">Demo</span>}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  ))}
+</Base>
+
+<style>
+  h1 { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+  .subtitle { color: var(--secondary); margin-bottom: 3rem; }
+
+  .year-group { margin-bottom: 2.5rem; }
+
+  .year-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .year-divider span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--secondary);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .year-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .list { display: flex; flex-direction: column; }
+
+  .item {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    padding: 1.75rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s;
+  }
+
+  .item:hover { background: var(--tag-bg); }
+
+  .item-image { flex-shrink: 0; }
+
+  .item-image img {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    transition: transform 0.3s ease;
+  }
+
+  .item:hover .item-image img { transform: scale(1.04); }
+
+  .no-image {
+    width: 110px;
+    height: 110px;
+    background: var(--tag-bg);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .no-image span { font-size: 1.5rem; font-weight: 700; color: var(--border); }
+
+  .item-content { flex: 1; }
+  .item-top { margin-bottom: 0.5rem; }
+
+  .badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .badge-journal    { background: rgba(59,130,246,0.12); color: #60a5fa; }
+  .badge-conference { background: rgba(16,185,129,0.12); color: #34d399; }
+  .badge-preprint   { background: rgba(245,158,11,0.12);  color: #fbbf24; }
+
+  .item-content h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    line-height: 1.4;
+  }
+
+  .authors { font-size: 0.9rem; color: var(--secondary); margin-bottom: 0.25rem; }
+  .authors strong { color: var(--primary); font-weight: 600; }
+  .venue { font-size: 0.85rem; font-style: italic; color: var(--secondary); margin-bottom: 0.75rem; }
+
+  .links { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+
+  .link-btn {
+    font-size: 0.78rem;
+    padding: 3px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--secondary);
+  }
+
+  @media (max-width: 640px) {
+    .item-image img, .no-image { width: 70px; height: 70px; }
+    .item { padding: 1.25rem 0.5rem; }
+  }
+</style>
