@@ -170,9 +170,9 @@ declare module 'astro:content' {
 } & { render(): Render[".md"] };
 };
 "projects": {
-"example-project.md": {
-	id: "example-project.md";
-  slug: "example-project";
+"age-estimation.md": {
+	id: "age-estimation.md";
+  slug: "age-estimation";
   body: string;
   collection: "projects";
   data: InferEntrySchema<"projects">

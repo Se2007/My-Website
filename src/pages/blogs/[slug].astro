@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft && !data.link);
+  const posts = await getCollection('blogs', ({ data }) => !data.draft);
   return posts.map(item => ({
     params: { slug: item.slug },
     props: { item },
@@ -12,7 +12,7 @@ export async function getStaticPaths() {
 
 const { item } = Astro.props;
 const { Content } = await item.render();
-const { title, description, date, banner, tags } = item.data;
+const { title, description, date, banner, link, tags } = item.data;
 
 const formatted = new Date(date).toLocaleDateString('en-US', {
   year: 'numeric', month: 'long', day: 'numeric',
@@ -38,13 +38,19 @@ const formatted = new Date(date).toLocaleDateString('en-US', {
           </div>
         )}
       </div>
+
+      {link && (
+        <a href={link} target="_blank" rel="noopener" class="medium-btn">
+          Read on Medium ↗
+        </a>
+      )}
     </header>
 
     <div class="content">
       <Content />
     </div>
 
-    <a href="/blog" class="back">← All posts</a>
+    <a href="/blogs" class="back">← All posts</a>
   </article>
 </Base>
 
@@ -65,9 +71,20 @@ const formatted = new Date(date).toLocaleDateString('en-US', {
     border-bottom: 1px solid var(--border);
   }
 
-  header h1 { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.75rem; line-height: 1.25; }
+  header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    line-height: 1.25;
+  }
 
-  .meta { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
 
   time { font-size: 0.85rem; color: var(--secondary); }
 
@@ -80,6 +97,20 @@ const formatted = new Date(date).toLocaleDateString('en-US', {
     padding: 2px 8px;
     border-radius: 4px;
   }
+
+  .medium-btn {
+    display: inline-block;
+    padding: 8px 20px;
+    background: var(--primary);
+    color: var(--theme);
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: opacity 0.2s;
+  }
+
+  .medium-btn:hover { opacity: 0.8; }
 
   .content { font-size: 1.1rem; line-height: 1.8; }
   .content h2 { font-size: 1.5rem; font-weight: 600; margin: 2.5rem 0 1rem; }

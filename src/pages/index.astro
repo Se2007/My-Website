@@ -14,6 +14,10 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft))
 const publications = (await getCollection('publications', ({ data }) => !data.draft))
   .sort((a, b) => Number(b.data.year) - Number(a.data.year))
   .slice(0, 3);
+
+const blogPosts = (await getCollection('blogs', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3);
 ---
 
 <Base title="Home">
@@ -30,6 +34,15 @@ const publications = (await getCollection('publications', ({ data }) => !data.dr
         deep neural networks, medical computer vision, and machine learning
         reinforcement systems.
       </p>
+      <div class="social-links">
+        <a href="mailto:your@email.com">Email</a>
+        <a href="https://github.com/Se2007" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://scholar.google.com/citations?user=yourid" target="_blank" rel="noopener">Scholar</a>
+        <a href="https://kaggle.com/sepehreslamimoghadam" target="_blank" rel="noopener">Kaggle</a>
+        <a href="https://huggingface.co/yourusername" target="_blank" rel="noopener">HuggingFace</a>
+        <a href="https://medium.com/@sepehr.eslami2019" target="_blank" rel="noopener">Medium</a>
+      </div>
     </div>
     <div class="hero-image">
       <img src="/profile.jpg" alt="Sepehr Eslami Moghadam" />
@@ -82,21 +95,23 @@ const publications = (await getCollection('publications', ({ data }) => !data.dr
     </div>
   </section>
 
-  <!-- Posts -->
+  <!-- Blog -->
   <section>
     <div class="section-header">
-      <h2>Publications</h2>
-      <a href="/publications">See all →</a>
+      <h2>Latest Posts</h2>
+      <a href="/blogs">See all →</a>
     </div>
     <div class="pub-list">
-      {publications.map(pub => (
-        <a href={`/publications/${pub.slug}`} class="pub-item">
-          <span class="pub-year">{pub.data.year}</span>
+      {blogPosts.map(post => (
+        <a href={`/blogs/${post.slug}`} class="pub-item">
+          <span class="pub-year">
+            {new Date(post.data.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+          </span>
           <div>
-            <p class="pub-title">{pub.data.title}</p>
-            <p class="pub-venue">{pub.data.venue}</p>
+            <p class="pub-title">{post.data.title}</p>
+            <p class="pub-venue">{post.data.description}</p>
           </div>
-          <span class={`badge badge-${pub.data.type}`}>{pub.data.type}</span>
+          {post.data.link && <span class="badge badge-medium">Medium</span>}
         </a>
       ))}
     </div>
@@ -126,6 +141,34 @@ const publications = (await getCollection('publications', ({ data }) => !data.dr
 
   .first-name {
     font-weight: 700;
+  }
+
+  .social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+  }
+
+  .social-links a {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.92rem;
+    font-weight: 500;
+    padding: 7px 18px;
+    border-radius: 24px;
+    border: 1.5px solid var(--border);
+    color: var(--secondary);
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.15s;
+  }
+
+  .social-links a:hover {
+    color: var(--primary);
+    border-color: var(--primary);
+    background: var(--tag-bg);
+    transform: translateY(-2px);
   }
 
   .hero-text p {
@@ -349,6 +392,7 @@ const publications = (await getCollection('publications', ({ data }) => !data.dr
   .badge-journal    { background: rgba(59,130,246,0.12); color: #60a5fa; }
   .badge-conference { background: rgba(16,185,129,0.12); color: #34d399; }
   .badge-preprint   { background: rgba(245,158,11,0.12);  color: #fbbf24; }
+  .badge-medium     { background: rgba(255,255,255,0.08); color: var(--secondary); }
 
   @media (max-width: 640px) {
     .hero {

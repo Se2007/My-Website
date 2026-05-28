@@ -2,7 +2,7 @@
 title: "My First Medium Post"
 description: "A short description of what this post is about."
 date: 2024-06-01
-banner: "/blog/post1.jpg"
+banner: "/gold-medal.jpg" 
 link: "https://medium.com/@username/my-post"
 tags: ["AI", "Python", "Tutorial"]
 ---

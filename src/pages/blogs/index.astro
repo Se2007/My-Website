@@ -20,12 +20,7 @@ const years = [...new Set(posts.map(p => new Date(p.data.date).getFullYear()))];
 
       <div class="list">
         {posts.filter(p => new Date(p.data.date).getFullYear() === year).map(post => (
-          <a
-            href={post.data.link ?? `/blog/${post.slug}`}
-            target={post.data.link ? '_blank' : '_self'}
-            rel={post.data.link ? 'noopener' : ''}
-            class="item"
-          >
+          <a href={`/blogs/${post.slug}`} class="item">
             {post.data.banner && (
               <div class="item-image">
                 <img src={post.data.banner} alt={post.data.title} />
@@ -35,7 +30,7 @@ const years = [...new Set(posts.map(p => new Date(p.data.date).getFullYear()))];
             <div class="item-content">
               <h2>
                 {post.data.title}
-                {post.data.link && <span class="external">↗</span>}
+
               </h2>
               <p class="desc">{post.data.description}</p>
               {post.data.tags && (
