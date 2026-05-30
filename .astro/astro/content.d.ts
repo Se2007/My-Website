@@ -170,6 +170,34 @@ declare module 'astro:content' {
 } & { render(): Render[".md"] };
 };
 "projects": {
+"Brain-Tumor-Segmentation.md": {
+	id: "Brain-Tumor-Segmentation.md";
+  slug: "brain-tumor-segmentation";
+  body: string;
+  collection: "projects";
+  data: InferEntrySchema<"projects">
+} & { render(): Render[".md"] };
+"Face-recognition.md": {
+	id: "Face-recognition.md";
+  slug: "face-recognition";
+  body: string;
+  collection: "projects";
+  data: InferEntrySchema<"projects">
+} & { render(): Render[".md"] };
+"Language-Modeling.md": {
+	id: "Language-Modeling.md";
+  slug: "language-modeling";
+  body: string;
+  collection: "projects";
+  data: InferEntrySchema<"projects">
+} & { render(): Render[".md"] };
+"Medical-Image_segmentation.md": {
+	id: "Medical-Image_segmentation.md";
+  slug: "medical-image_segmentation";
+  body: string;
+  collection: "projects";
+  data: InferEntrySchema<"projects">
+} & { render(): Render[".md"] };
 "age-estimation.md": {
 	id: "age-estimation.md";
   slug: "age-estimation";
