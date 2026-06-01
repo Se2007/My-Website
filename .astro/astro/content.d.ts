@@ -198,6 +198,20 @@ declare module 'astro:content' {
   collection: "projects";
   data: InferEntrySchema<"projects">
 } & { render(): Render[".md"] };
+"Oncogemma.md": {
+	id: "Oncogemma.md";
+  slug: "oncogemma";
+  body: string;
+  collection: "projects";
+  data: InferEntrySchema<"projects">
+} & { render(): Render[".md"] };
+"TCGA-BRCA-Dataset.md": {
+	id: "TCGA-BRCA-Dataset.md";
+  slug: "tcga-brca-dataset";
+  body: string;
+  collection: "projects";
+  data: InferEntrySchema<"projects">
+} & { render(): Render[".md"] };
 "age-estimation.md": {
 	id: "age-estimation.md";
   slug: "age-estimation";
