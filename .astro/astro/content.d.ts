@@ -152,9 +152,23 @@ declare module 'astro:content' {
 
 	type ContentEntryMap = {
 		"achievements": {
-"gold-medal.md": {
-	id: "gold-medal.md";
-  slug: "gold-medal";
+"RIT-AI-Competition.md": {
+	id: "RIT-AI-Competition.md";
+  slug: "rit-ai-competition";
+  body: string;
+  collection: "achievements";
+  data: InferEntrySchema<"achievements">
+} & { render(): Render[".md"] };
+"STEM-Best-Practice.md": {
+	id: "STEM-Best-Practice.md";
+  slug: "stem-best-practice";
+  body: string;
+  collection: "achievements";
+  data: InferEntrySchema<"achievements">
+} & { render(): Render[".md"] };
+"Top-Robotics-Researche.md": {
+	id: "Top-Robotics-Researche.md";
+  slug: "top-robotics-researche";
   body: string;
   collection: "achievements";
   data: InferEntrySchema<"achievements">
