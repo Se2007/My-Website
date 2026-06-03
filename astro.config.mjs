@@ -1,14 +1,10 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
-import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
-  site: 'https://amirpourmand.ir',
+  site: 'https://my-website.vercel.app',
   integrations: [
-    mdx(),
-    sitemap({
-      filter: (page) => !page.includes('/page/'),
-    }),
+    mdx(), 
   ],
   markdown: {
     shikiConfig: {
